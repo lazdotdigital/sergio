@@ -15,13 +15,14 @@ pub struct Game {
     last_target_time: f64,
     last_move_key_pressed: KeyCode,
     score: isize,
+    ready_fire: bool,
 }
 
 impl Game {
     pub async fn new() -> Self {
         let player_sprites = player::Sprites {
             idle: Sprite::new("assets/aku.png", 59., 30., 6, 1).await,
-            attack: Sprite::new("assets/aku.png", 59., 30., 3, 10).await,
+            attack: Sprite::new("assets/aku.png", 59., 30., 2, 10).await,
         };
 
         Self {
@@ -31,6 +32,7 @@ impl Game {
             last_target_time: get_time(),
             last_move_key_pressed: KeyCode::D,
             score: 0,
+            ready_fire: true,
         }
     }
 
@@ -41,14 +43,15 @@ impl Game {
 
     fn space_handler(&mut self) {
         if is_key_down(KeyCode::Space) {
-            if let None = self.bullet {
-                self.bullet = Some(Bullet::new(
-                    self.player.x(),
-                    self.player.y(),
-                    self.last_move_key_pressed,
-                ));
+            if self.ready_fire {
+                let y = self.player.y() + 12.5;
+                self.bullet = Some(Bullet::new(self.player.x(), y, self.last_move_key_pressed));
                 self.player.start_attacking();
+                self.ready_fire = false;
             }
+        }
+        if is_key_released(KeyCode::Space) {
+            self.ready_fire = true;
         }
     }
 
@@ -57,9 +60,9 @@ impl Game {
             self.add_target();
         }
 
-        self.player.draw(self.last_move_key_pressed);
         self.draw_bullet();
         self.draw_targets();
+        self.player.draw(self.last_move_key_pressed);
         self.handle_hit_target();
         self.draw_score();
     }

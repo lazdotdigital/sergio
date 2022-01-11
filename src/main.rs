@@ -14,7 +14,9 @@ async fn main() {
         clear_background(BLACK);
 
         game.input_handler();
-        game.draw();
+        if game.draw() {
+            game = Game::new().await;
+        }
 
         next_frame().await
     }

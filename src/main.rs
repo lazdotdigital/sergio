@@ -6,7 +6,7 @@ mod util;
 use game::Game;
 use macroquad::prelude::*;
 
-#[macroquad::main("Learning")]
+#[macroquad::main("Segio")]
 async fn main() {
     let mut game = Game::new().await;
 
